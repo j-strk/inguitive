@@ -15,6 +15,13 @@ class Component:
         self.cls = cls
         self.attrs = attrs
 
+    def _get_attrs_str(self) -> str:
+        """Convert attributes to HTML string, handling cls -> class conversion"""
+        filtered_attrs = {k: v for k, v in self.attrs.items() if k != 'cls'}
+        if self.cls:
+            filtered_attrs['class'] = self.cls
+        return " ".join(f'{k}="{v}"' for k, v in filtered_attrs.items())
+
     def render(self) -> str:
         raise NotImplementedError
 
@@ -24,11 +31,7 @@ class Div(Component):
         self.children = children or []
 
     def render(self) -> str:
-        # Remove cls from attrs if present, and add it as class
-        filtered_attrs = {k: v for k, v in self.attrs.items() if k != 'cls'}
-        if self.cls:
-            filtered_attrs['class'] = self.cls
-        attrs = " ".join(f'{k}="{v}"' for k, v in filtered_attrs.items())
+        attrs = self._get_attrs_str()
         children_html = "".join(
             child.render() if hasattr(child, "render") else str(child)
             for child in self.children
@@ -41,10 +44,7 @@ class Button(Component):
         self.text = text
 
     def render(self) -> str:
-        filtered_attrs = {k: v for k, v in self.attrs.items() if k != 'cls'}
-        if self.cls:
-            filtered_attrs['class'] = self.cls
-        attrs = " ".join(f'{k}="{v}"' for k, v in filtered_attrs.items())
+        attrs = self._get_attrs_str()
         return f"<button {attrs}>{self.text}</button>"
 
 class Label(Component):
@@ -53,10 +53,7 @@ class Label(Component):
         self.text = text
 
     def render(self) -> str:
-        filtered_attrs = {k: v for k, v in self.attrs.items() if k != 'cls'}
-        if self.cls:
-            filtered_attrs['class'] = self.cls
-        attrs = " ".join(f'{k}="{v}"' for k, v in filtered_attrs.items())
+        attrs = self._get_attrs_str()
         return f"<p {attrs}>{self.text}</p>"
 
 # --- Counter-Component (mit HTMX) ---
