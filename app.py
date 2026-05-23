@@ -70,6 +70,16 @@ def Counter():
                 "hx-swap": "innerHTML",        # Ersetze nur den Inhalt des Labels
                 "cls": "bg-blue-500 text-white p-2 rounded mt-2"
             }
+        ),
+        # Button zum Zurücksetzen
+        Button(
+            "Reset",
+            **{
+                "hx-post": "/reset",          # POST an /reset
+                "hx-target": "#counter-label", # Ziel: das Label mit ID "counter-label"
+                "hx-swap": "innerHTML",        # Ersetze nur den Inhalt des Labels
+                "cls": "bg-red-500 text-white p-2 rounded mt-2"
+            }
         )
     ], cls="p-4 max-w-xs mx-auto")
 
@@ -84,6 +94,12 @@ def home(request: Request):
 @app.post("/increment", response_class=HTMLResponse)
 def increment():
     counter_state["count"] += 1
+    # Gib NUR den neuen Inhalt des Labels zurück (kein vollständiges HTML!)
+    return f'<p class="text-xl">Count: {counter_state["count"]}</p>'
+
+@app.post("/reset", response_class=HTMLResponse)
+def reset():
+    counter_state["count"] = 0
     # Gib NUR den neuen Inhalt des Labels zurück (kein vollständiges HTML!)
     return f'<p class="text-xl">Count: {counter_state["count"]}</p>'
 
